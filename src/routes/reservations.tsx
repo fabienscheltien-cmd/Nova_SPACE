@@ -12,12 +12,12 @@ import {
 export const Route = createFileRoute("/reservations")({
   head: () => ({
     meta: [
-      { title: "Mes réservations — ZenRooms" },
+      { title: "Mes réservations — Nova Zen" },
       {
         name: "description",
         content: "Suivez et gérez vos réservations de salles de réunion.",
       },
-      { property: "og:title", content: "Mes réservations — ZenRooms" },
+      { property: "og:title", content: "Mes réservations — Nova Zen" },
       {
         property: "og:description",
         content: "Suivez et gérez vos réservations de salles de réunion.",
@@ -123,7 +123,7 @@ function ReservationsPage() {
         <p className="mt-10 flex items-center gap-2 text-sm text-muted-foreground">
           <Users className="size-4" />
           Besoin d'une configuration spéciale ? Écrivez-nous à
-          contact@zenrooms.fr
+          contact@nova-serenity.fr
         </p>
       </main>
     </div>

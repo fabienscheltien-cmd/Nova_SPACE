@@ -7,13 +7,13 @@ import { Header } from "@/components/Header";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "ZenRooms — Réservation de salles de réunion" },
+      { title: "Nova Zen — Réservation de salles de réunion" },
       {
         name: "description",
         content:
           "Réservez une salle de réunion en 30 secondes. Choisissez votre salle, votre créneau, et c'est fait.",
       },
-      { property: "og:title", content: "ZenRooms — Réservation de salles de réunion" },
+      { property: "og:title", content: "Nova Zen — Réservation de salles de réunion" },
       {
         property: "og:description",
         content:
@@ -142,7 +142,7 @@ function Index() {
       </section>
 
       <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
-        ZENROOMS — Vos réunions, en toute sérénité.
+        NOVA ZEN — Vos réunions, en toute sérénité.
       </footer>
     </div>
   );

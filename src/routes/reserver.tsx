@@ -15,12 +15,12 @@ export const Route = createFileRoute("/reserver")({
     typeof search["room"] === "string" ? { room: search["room"] as string } : {},
   head: () => ({
     meta: [
-      { title: "Réserver une salle — ZenRooms" },
+      { title: "Réserver une salle — Nova Zen" },
       {
         name: "description",
         content: "Choisissez votre salle, votre date et votre créneau horaire.",
       },
-      { property: "og:title", content: "Réserver une salle — ZenRooms" },
+      { property: "og:title", content: "Réserver une salle — Nova Zen" },
       {
         property: "og:description",
         content: "Choisissez votre salle, votre date et votre créneau horaire.",
