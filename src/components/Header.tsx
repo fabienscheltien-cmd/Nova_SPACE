@@ -31,12 +31,14 @@ export function Header() {
           <img
             src={logoZenSpace.url}
             alt="Logo Nova Zen"
-            width={486}
-            height={112}
-            className="h-6 w-auto max-w-full sm:h-8"
+            width={2861}
+            height={672}
+            decoding="async"
+            className="h-7 w-auto max-w-full object-contain sm:h-9 lg:h-10"
           />
-          <span className="text-sm font-bold tracking-[0.35em] text-[#7eb8a2] sm:text-lg">
+          <span className="text-base font-bold tracking-[0.3em] text-[#7eb8a2] sm:text-xl lg:text-2xl">
             SPACE
+
           </span>
         </Link>
 
