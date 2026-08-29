@@ -11,8 +11,8 @@ import {
 } from "@/lib/rooms";
 
 export const Route = createFileRoute("/reserver")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    room: typeof search.room === "string" ? search.room : undefined,
+  validateSearch: (search: Record<string, unknown>): { room?: string } => ({
+    room: typeof search["room"] === "string" ? (search["room"] as string) : undefined,
   }),
   head: () => ({
     meta: [
