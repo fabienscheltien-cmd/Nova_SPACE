@@ -39,7 +39,7 @@ function todayISO() {
 function ReserverPage() {
   const { room: initialRoom } = Route.useSearch();
   const navigate = useNavigate();
-  const [roomId, setRoomId] = useState(initialRoom ?? ROOMS[0].id);
+  const [roomId, setRoomId] = useState(initialRoom ?? ROOMS[0]!.id);
   const [date, setDate] = useState(todayISO());
   const [slot, setSlot] = useState<string | null>(null);
   const [hours, setHours] = useState(1);
@@ -48,7 +48,7 @@ function ReserverPage() {
   const [confirmed, setConfirmed] = useState(false);
   const [, forceRefresh] = useState(0);
 
-  const room = ROOMS.find((r) => r.id === roomId) ?? ROOMS[0];
+  const room = ROOMS.find((r) => r.id === roomId) ?? ROOMS[0]!;
   const total = room.pricePerHour * hours;
 
   const slots = useMemo(
