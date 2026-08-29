@@ -25,17 +25,19 @@ export function Header() {
 
         <Link
           to="/"
-          className="flex min-w-0 justify-center"
+          className="flex min-w-0 items-center justify-center gap-2"
           aria-label="Nova Zen Space — accueil"
         >
           <img
             src={logoZenSpace.url}
-            alt="Logo Nova Zen Space"
+            alt="Logo Nova Zen"
             width={486}
             height={112}
             className="h-6 w-auto max-w-full sm:h-8"
           />
-          <span className="sr-only">Nova Zen Space</span>
+          <span className="text-sm font-bold tracking-[0.35em] text-[#7eb8a2] sm:text-lg">
+            SPACE
+          </span>
         </Link>
 
         <nav className="flex shrink-0 items-center gap-1 text-sm font-medium">
