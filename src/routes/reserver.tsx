@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, CalendarPlus, Check, Download, Lock, Users } from "lucide-react";
+import { ArrowRight, CalendarPlus, Check, Download, Lock, MapPin, Users } from "lucide-react";
 import { Header } from "@/components/Header";
 import {
   ROOMS,
@@ -18,12 +18,12 @@ export const Route = createFileRoute("/reserver")({
     typeof search["room"] === "string" ? { room: search["room"] as string } : {},
   head: () => ({
     meta: [
-      { title: "Réserver une salle — Nova Zen" },
+      { title: "Réserver une salle — Nova Zen Space" },
       {
         name: "description",
         content: "Choisissez votre salle, votre date et votre créneau horaire.",
       },
-      { property: "og:title", content: "Réserver une salle — Nova Zen" },
+      { property: "og:title", content: "Réserver une salle — Nova Zen Space" },
       {
         property: "og:description",
         content: "Choisissez votre salle, votre date et votre créneau horaire.",
@@ -59,7 +59,6 @@ function ReserverPage() {
   }, []);
 
   const room = ROOMS.find((r) => r.id === roomId) ?? ROOMS[0]!;
-  const total = room.pricePerHour * hours;
 
   const slots = useMemo(
     () =>
@@ -82,6 +81,7 @@ function ReserverPage() {
       name,
       email,
       subject,
+      location: room.location,
       confidential,
     });
     setConfirmed(created);
@@ -98,8 +98,8 @@ function ReserverPage() {
             </span>
             <h1 className="mt-6 text-3xl font-bold">Réservation confirmée</h1>
             <p className="mt-3 text-muted-foreground">
-              {room.name} — {formatDateFR(date)} à {slot}, pour {hours}h (
-              {total} €). Un récapitulatif a été envoyé à {email}.
+              {room.name} ({room.location}) — {formatDateFR(date)} à {slot},
+              pour {hours}h. Un récapitulatif a été envoyé à {email}.
             </p>
             <div className="mt-6 w-full rounded-xl border border-border bg-background/60 p-4 text-left text-sm">
               <p className="font-semibold">Bloquer le créneau dans l'agenda</p>
@@ -190,8 +190,11 @@ function ReserverPage() {
                         <div className="bg-card p-3">
                           <p className="text-sm font-bold">{r.name}</p>
                           <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                            <Users className="size-3" /> {r.capacity} pers. —{" "}
-                            {r.pricePerHour} €/h
+                            <Users className="size-3 shrink-0" /> {r.capacity} pers.
+                          </p>
+                          <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                            <MapPin className="size-3 shrink-0 text-brand-green" />{" "}
+                            {r.location}
                           </p>
                         </div>
                       </button>
