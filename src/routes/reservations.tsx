@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CalendarX2, Trash2, Users } from "lucide-react";
 import { Header } from "@/components/Header";
 import {
@@ -30,7 +30,11 @@ export const Route = createFileRoute("/reservations")({
 });
 
 function ReservationsPage() {
-  const [reservations, setReservations] = useState(getReservations);
+  const [reservations, setReservations] = useState<ReturnType<typeof getReservations>>([]);
+
+  useEffect(() => {
+    setReservations(getReservations());
+  }, []);
 
   function handleCancel(id: string) {
     cancelReservation(id);
