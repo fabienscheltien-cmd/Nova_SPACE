@@ -11,9 +11,8 @@ import {
 } from "@/lib/rooms";
 
 export const Route = createFileRoute("/reserver")({
-  validateSearch: (search: Record<string, unknown>): { room?: string } => ({
-    room: typeof search["room"] === "string" ? (search["room"] as string) : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { room?: string } =>
+    typeof search["room"] === "string" ? { room: search["room"] as string } : {},
   head: () => ({
     meta: [
       { title: "Réserver une salle — ZenRooms" },
