@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Check, Users } from "lucide-react";
 import { Header } from "@/components/Header";
 import {
@@ -46,7 +46,12 @@ function ReserverPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [confirmed, setConfirmed] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const [, forceRefresh] = useState(0);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
   const room = ROOMS.find((r) => r.id === roomId) ?? ROOMS[0]!;
   const total = room.pricePerHour * hours;
@@ -55,10 +60,10 @@ function ReserverPage() {
     () =>
       TIME_SLOTS.map((s) => ({
         time: s,
-        taken: isSlotTaken(roomId, date, s),
+        taken: hydrated ? isSlotTaken(roomId, date, s) : false,
       })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [roomId, date, confirmed, forceRefresh],
+    [hydrated, roomId, date, confirmed, forceRefresh],
   );
 
   function handleSubmit(e: React.FormEvent) {
