@@ -36,10 +36,10 @@ export function Header() {
             decoding="async"
             className="h-7 w-auto max-w-full object-contain sm:h-9 lg:h-10"
           />
-          <span className="text-base font-bold tracking-[0.3em] text-[#7eb8a2] sm:text-xl lg:text-2xl">
-            SPACE
-
+          <span className="font-heading text-lg font-extrabold uppercase leading-none tracking-[0.04em] text-[#7eb8a2] sm:text-[1.45rem] lg:text-[1.7rem]">
+            Space
           </span>
+
         </Link>
 
         <nav className="flex shrink-0 items-center gap-1 text-sm font-medium">
