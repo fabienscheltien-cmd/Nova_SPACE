@@ -6,7 +6,7 @@ export interface Room {
   id: string;
   name: string;
   capacity: number;
-  pricePerHour: number;
+  location: string;
   image: string;
   description: string;
   equipements: string[];
@@ -17,7 +17,7 @@ export const ROOMS: Room[] = [
     id: "conseil",
     name: "Salle du Conseil",
     capacity: 12,
-    pricePerHour: 45,
+    location: "8ᵉ étage — Salle 102",
     image: roomBoardroom,
     description:
       "Notre salle prestige avec vue panoramique, grande table en noyer et visioconférence 4K.",
@@ -27,7 +27,7 @@ export const ROOMS: Room[] = [
     id: "atelier",
     name: "Salon Atelier",
     capacity: 4,
-    pricePerHour: 18,
+    location: "6ᵉ étage — Salle 604",
     image: roomCreative,
     description:
       "Un écrin feutré pour vos entretiens, sessions de coaching ou réunions confidentielles.",
@@ -37,7 +37,7 @@ export const ROOMS: Room[] = [
     id: "formation",
     name: "Amphithéâtre Formation",
     capacity: 60,
-    pricePerHour: 120,
+    location: "2ᵉ étage — Auditorium 201",
     image: roomFormation,
     description:
       "Configuration séminaire avec vidéoprojecteur, sonorisation et tables modulables.",
@@ -69,6 +69,7 @@ export interface Reservation {
   name: string;
   email: string;
   subject: string;
+  location: string;
   confidential: boolean;
   createdAt: string;
 }
@@ -161,7 +162,7 @@ export function buildICS(r: Reservation, roomName: string) {
     `DTSTART:${icsDate(r.date, r.slot)}`,
     `DTEND:${icsDate(r.date, r.slot, r.hours)}`,
     `SUMMARY:${escapeICS(title)}`,
-    `LOCATION:${escapeICS(roomName)}`,
+    `LOCATION:${escapeICS(r.location)}`,
     `DESCRIPTION:${escapeICS(description)}`,
     `CLASS:${r.confidential ? "PRIVATE" : "PUBLIC"}`,
     "TRANSP:OPAQUE",
@@ -182,7 +183,7 @@ export function googleCalendarHref(r: Reservation, roomName: string) {
     action: "TEMPLATE",
     text: calendarTitle(r, roomName),
     dates: `${icsDate(r.date, r.slot)}/${icsDate(r.date, r.slot, r.hours)}`,
-    location: roomName,
+    location: r.location,
     details: r.confidential
       ? "Créneau bloqué — détails confidentiels."
       : `Objet : ${r.subject || "Réunion"} | Réservé par : ${r.name} | Durée : ${r.hours}h`,
