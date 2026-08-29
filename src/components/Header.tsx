@@ -36,7 +36,7 @@ export function Header() {
             decoding="async"
             className="h-7 w-auto max-w-full object-contain sm:h-9 lg:h-10"
           />
-          <span className="font-heading text-lg font-extrabold uppercase leading-none tracking-[0.04em] text-[#7eb8a2] sm:text-[1.45rem] lg:text-[1.7rem]">
+          <span className="font-display text-lg font-extrabold uppercase leading-none tracking-[0.04em] text-[#7eb8a2] sm:text-[1.45rem] lg:text-[1.7rem]">
             Space
           </span>
 
