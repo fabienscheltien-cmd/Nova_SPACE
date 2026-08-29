@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Check, Users } from "lucide-react";
+import { ArrowRight, CalendarPlus, Check, Download, Lock, Users } from "lucide-react";
 import { Header } from "@/components/Header";
 import {
   ROOMS,
@@ -8,6 +8,9 @@ import {
   addReservation,
   isSlotTaken,
   formatDateFR,
+  icsHref,
+  googleCalendarHref,
+  type Reservation,
 } from "@/lib/rooms";
 
 export const Route = createFileRoute("/reserver")({
@@ -15,12 +18,12 @@ export const Route = createFileRoute("/reserver")({
     typeof search["room"] === "string" ? { room: search["room"] as string } : {},
   head: () => ({
     meta: [
-      { title: "Réserver une salle — ZenRooms" },
+      { title: "Réserver une salle — Nova Zen" },
       {
         name: "description",
         content: "Choisissez votre salle, votre date et votre créneau horaire.",
       },
-      { property: "og:title", content: "Réserver une salle — ZenRooms" },
+      { property: "og:title", content: "Réserver une salle — Nova Zen" },
       {
         property: "og:description",
         content: "Choisissez votre salle, votre date et votre créneau horaire.",
@@ -45,7 +48,9 @@ function ReserverPage() {
   const [hours, setHours] = useState(1);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [confirmed, setConfirmed] = useState(false);
+  const [subject, setSubject] = useState("");
+  const [confidential, setConfidential] = useState(false);
+  const [confirmed, setConfirmed] = useState<Reservation | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [, forceRefresh] = useState(0);
 
@@ -68,9 +73,18 @@ function ReserverPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!slot || !name || !email) return;
-    addReservation({ roomId, date, slot, hours, name, email });
-    setConfirmed(true);
+    if (!slot || !name || !email || !subject) return;
+    const created = addReservation({
+      roomId,
+      date,
+      slot,
+      hours,
+      name,
+      email,
+      subject,
+      confidential,
+    });
+    setConfirmed(created);
   }
 
   return (
@@ -87,6 +101,31 @@ function ReserverPage() {
               {room.name} — {formatDateFR(date)} à {slot}, pour {hours}h (
               {total} €). Un récapitulatif a été envoyé à {email}.
             </p>
+            <div className="mt-6 w-full rounded-xl border border-border bg-background/60 p-4 text-left text-sm">
+              <p className="font-semibold">Bloquer le créneau dans l'agenda</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {confidential
+                  ? "L'événement s'affichera comme « Réservé (confidentiel) », sans objet ni nom."
+                  : `L'événement affichera : « ${subject} — ${name} (${hours}h) ».`}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <a
+                  href={icsHref(confirmed, room.name)}
+                  download={`nova-zen-${confirmed.date}-${confirmed.slot.replace(":", "h")}.ics`}
+                  className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-semibold transition-colors hover:bg-accent"
+                >
+                  <Download className="size-3.5" /> Fichier .ics
+                </a>
+                <a
+                  href={googleCalendarHref(confirmed, room.name)}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-semibold transition-colors hover:bg-accent"
+                >
+                  <CalendarPlus className="size-3.5" /> Google Agenda
+                </a>
+              </div>
+            </div>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <button
                 onClick={() => navigate({ to: "/reservations" })}
@@ -96,7 +135,7 @@ function ReserverPage() {
               </button>
               <button
                 onClick={() => {
-                  setConfirmed(false);
+                  setConfirmed(null);
                   setSlot(null);
                   forceRefresh((n) => n + 1);
                 }}
@@ -231,7 +270,33 @@ function ReserverPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       className="rounded-lg border border-input bg-card px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                     />
+                    <input
+                      type="text"
+                      required
+                      placeholder="Objet de la réunion"
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                      className="rounded-lg border border-input bg-card px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring sm:col-span-2"
+                    />
                   </div>
+                  <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-card p-4">
+                    <input
+                      type="checkbox"
+                      checked={confidential}
+                      onChange={(e) => setConfidential(e.target.checked)}
+                      className="mt-0.5 size-4 accent-primary"
+                    />
+                    <span className="text-sm">
+                      <span className="flex items-center gap-2 font-medium">
+                        <Lock className="size-3.5" /> Réunion confidentielle
+                      </span>
+                      <span className="mt-1 block text-xs text-muted-foreground">
+                        L'objet et le nom du réservataire seront masqués dans
+                        l'agenda partagé : seul « Réservé (confidentiel) »
+                        apparaîtra.
+                      </span>
+                    </span>
+                  </label>
                 </section>
               </div>
 
@@ -264,7 +329,7 @@ function ReserverPage() {
                 </dl>
                 <button
                   type="submit"
-                  disabled={!slot || !name || !email}
+                  disabled={!slot || !name || !email || !subject}
                   className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-transform enabled:hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Confirmer la réservation

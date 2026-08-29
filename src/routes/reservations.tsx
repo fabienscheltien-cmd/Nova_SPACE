@@ -1,23 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CalendarX2, Trash2, Users } from "lucide-react";
+import { CalendarPlus, CalendarX2, Download, Lock, Trash2, Users } from "lucide-react";
 import { Header } from "@/components/Header";
 import {
   ROOMS,
   cancelReservation,
   formatDateFR,
   getReservations,
+  icsHref,
+  googleCalendarHref,
 } from "@/lib/rooms";
 
 export const Route = createFileRoute("/reservations")({
   head: () => ({
     meta: [
-      { title: "Mes réservations — ZenRooms" },
+      { title: "Mes réservations — Nova Zen" },
       {
         name: "description",
         content: "Suivez et gérez vos réservations de salles de réunion.",
       },
-      { property: "og:title", content: "Mes réservations — ZenRooms" },
+      { property: "og:title", content: "Mes réservations — Nova Zen" },
       {
         property: "og:description",
         content: "Suivez et gérez vos réservations de salles de réunion.",
@@ -92,9 +94,35 @@ function ReservationsPage() {
                       {formatDateFR(r.date)} — {r.slot} · {r.hours}h ·{" "}
                       {(room?.pricePerHour ?? 0) * r.hours} €
                     </p>
+                    <p className="mt-1 text-sm">
+                      {r.confidential ? (
+                        <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                          <Lock className="size-3.5" /> Objet confidentiel
+                        </span>
+                      ) : (
+                        <span className="font-medium">{r.subject}</span>
+                      )}
+                    </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {r.name} · {r.email}
                     </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <a
+                        href={icsHref(r, room?.name ?? r.roomId)}
+                        download={`nova-zen-${r.date}-${r.slot.replace(":", "h")}.ics`}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-semibold transition-colors hover:bg-accent"
+                      >
+                        <Download className="size-3.5" /> .ics
+                      </a>
+                      <a
+                        href={googleCalendarHref(r, room?.name ?? r.roomId)}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-semibold transition-colors hover:bg-accent"
+                      >
+                        <CalendarPlus className="size-3.5" /> Google Agenda
+                      </a>
+                    </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <span
@@ -123,7 +151,7 @@ function ReservationsPage() {
         <p className="mt-10 flex items-center gap-2 text-sm text-muted-foreground">
           <Users className="size-4" />
           Besoin d'une configuration spéciale ? Écrivez-nous à
-          contact@zenrooms.fr
+          contact@nova-serenity.fr
         </p>
       </main>
     </div>

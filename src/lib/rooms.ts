@@ -68,6 +68,8 @@ export interface Reservation {
   hours: number;
   name: string;
   email: string;
+  subject: string;
+  confidential: boolean;
   createdAt: string;
 }
 
@@ -115,4 +117,75 @@ export function formatDateFR(iso: string) {
     month: "long",
     year: "numeric",
   }).format(new Date(iso + "T00:00:00"));
+}
+
+/** Libellé affiché dans le calendrier (masqué si confidentiel). */
+export function calendarTitle(r: Reservation, roomName: string) {
+  if (r.confidential) return `Réservé — ${roomName} (confidentiel)`;
+  return `${r.subject || "Réunion"} — ${r.name} (${r.hours}h)`;
+}
+
+function icsDate(date: string, time: string, addHours = 0) {
+  const d = new Date(`${date}T${time}:00`);
+  d.setHours(d.getHours() + addHours);
+  return (
+    d.getUTCFullYear().toString() +
+    String(d.getUTCMonth() + 1).padStart(2, "0") +
+    String(d.getUTCDate()).padStart(2, "0") +
+    "T" +
+    String(d.getUTCHours()).padStart(2, "0") +
+    String(d.getUTCMinutes()).padStart(2, "0") +
+    "00Z"
+  );
+}
+
+function escapeICS(v: string) {
+  return v.replace(/[\\;,]/g, (m) => "\\" + m).replace(/\n/g, "\\n");
+}
+
+/** Génère le contenu .ics qui bloque le créneau dans le calendrier. */
+export function buildICS(r: Reservation, roomName: string) {
+  const title = calendarTitle(r, roomName);
+  const description = r.confidential
+    ? "Créneau bloqué — détails confidentiels."
+    : `Objet : ${r.subject || "Réunion"}\nRéservé par : ${r.name} (${r.email})\nDurée : ${r.hours}h`;
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Nova Zen//Reservation//FR",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    "BEGIN:VEVENT",
+    `UID:${r.id}@nova-zen`,
+    `DTSTAMP:${icsDate(r.date, r.slot)}`,
+    `DTSTART:${icsDate(r.date, r.slot)}`,
+    `DTEND:${icsDate(r.date, r.slot, r.hours)}`,
+    `SUMMARY:${escapeICS(title)}`,
+    `LOCATION:${escapeICS(roomName)}`,
+    `DESCRIPTION:${escapeICS(description)}`,
+    `CLASS:${r.confidential ? "PRIVATE" : "PUBLIC"}`,
+    "TRANSP:OPAQUE",
+    "STATUS:CONFIRMED",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\r\n");
+}
+
+/** Lien data: téléchargeable pour bloquer le créneau dans n'importe quel agenda. */
+export function icsHref(r: Reservation, roomName: string) {
+  return `data:text/calendar;charset=utf-8,${encodeURIComponent(buildICS(r, roomName))}`;
+}
+
+/** Lien Google Agenda pré-rempli. */
+export function googleCalendarHref(r: Reservation, roomName: string) {
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: calendarTitle(r, roomName),
+    dates: `${icsDate(r.date, r.slot)}/${icsDate(r.date, r.slot, r.hours)}`,
+    location: roomName,
+    details: r.confidential
+      ? "Créneau bloqué — détails confidentiels."
+      : `Objet : ${r.subject || "Réunion"} | Réservé par : ${r.name} | Durée : ${r.hours}h`,
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
