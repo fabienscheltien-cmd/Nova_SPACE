@@ -19,7 +19,7 @@ export function Header() {
             alt="Logo Nova Serenity"
             width={992}
             height={672}
-            className="h-10 w-auto"
+            className="h-12 w-auto"
           />
         </a>
 
@@ -29,7 +29,7 @@ export function Header() {
             alt="Logo Nova Zen"
             width={1536}
             height={512}
-            className="h-7 w-auto"
+            className="h-9 w-auto"
           />
         </Link>
 
