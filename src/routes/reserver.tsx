@@ -325,10 +325,11 @@ function ReserverPage() {
                     <dt className="text-muted-foreground">Durée</dt>
                     <dd className="font-medium">{hours}h</dd>
                   </div>
-                  <div className="flex justify-between border-t border-border pt-3 text-base">
-                    <dt className="font-semibold">Total</dt>
-                    <dd className="font-bold text-primary">{total} €</dd>
+                  <div className="flex justify-between gap-4 border-t border-border pt-3">
+                    <dt className="text-muted-foreground">Localisation</dt>
+                    <dd className="text-right font-medium">{room?.location ?? "—"}</dd>
                   </div>
+
                 </dl>
                 <button
                   type="submit"
