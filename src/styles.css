@@ -32,32 +32,36 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+  --color-brand-green: var(--brand-green);
+  --color-brand-blue: var(--brand-blue);
   --font-display: "Outfit", sans-serif;
   --font-sans: "Figtree", sans-serif;
 }
 
 :root {
   --radius: 0.75rem;
-  /* Nuit profonde — inspiré du design NOVA */
-  --background: oklch(0.145 0.045 262);
-  --foreground: oklch(0.96 0.008 250);
-  --card: oklch(0.19 0.05 262);
-  --card-foreground: oklch(0.96 0.008 250);
-  --popover: oklch(0.19 0.05 262);
-  --popover-foreground: oklch(0.96 0.008 250);
-  --primary: oklch(0.62 0.19 245);
-  --primary-foreground: oklch(0.985 0.005 250);
-  --secondary: oklch(0.24 0.055 262);
-  --secondary-foreground: oklch(0.96 0.008 250);
-  --muted: oklch(0.22 0.05 262);
-  --muted-foreground: oklch(0.72 0.03 250);
-  --accent: oklch(0.26 0.06 258);
-  --accent-foreground: oklch(0.96 0.008 250);
-  --destructive: oklch(0.63 0.21 25);
-  --destructive-foreground: oklch(0.985 0.005 250);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.62 0.19 245);
+  /* Charte Nova Serenity — bleu #2569a8, vert #7eb8a2, nuit #071424 */
+  --brand-blue: #2569a8;
+  --brand-green: #7eb8a2;
+  --background: #071424;
+  --foreground: #eef4fa;
+  --card: #0e2036;
+  --card-foreground: #eef4fa;
+  --popover: #0e2036;
+  --popover-foreground: #eef4fa;
+  --primary: #2569a8;
+  --primary-foreground: #f4f9ff;
+  --secondary: #14293f;
+  --secondary-foreground: #eef4fa;
+  --muted: #12263a;
+  --muted-foreground: #9db2c7;
+  --accent: #17304a;
+  --accent-foreground: #eef4fa;
+  --destructive: #d0523f;
+  --destructive-foreground: #fff5f3;
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: #2569a8;
 }
 
 @layer base {
