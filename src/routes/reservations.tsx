@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CalendarPlus, CalendarX2, Download, Lock, Trash2, Users } from "lucide-react";
+import { CalendarPlus, CalendarX2, Download, Lock, MapPin, Trash2, Users } from "lucide-react";
 import { Header } from "@/components/Header";
 import {
   ROOMS,
@@ -14,12 +14,12 @@ import {
 export const Route = createFileRoute("/reservations")({
   head: () => ({
     meta: [
-      { title: "Mes réservations — Nova Zen" },
+      { title: "Mes réservations — Nova Zen Space" },
       {
         name: "description",
         content: "Suivez et gérez vos réservations de salles de réunion.",
       },
-      { property: "og:title", content: "Mes réservations — Nova Zen" },
+      { property: "og:title", content: "Mes réservations — Nova Zen Space" },
       {
         property: "og:description",
         content: "Suivez et gérez vos réservations de salles de réunion.",
@@ -90,9 +90,11 @@ function ReservationsPage() {
                   )}
                   <div className="min-w-0 flex-1">
                     <p className="font-bold">{room?.name ?? r.roomId}</p>
+                    <p className="mt-1 flex items-center gap-1.5 text-xs text-brand-green">
+                      <MapPin className="size-3.5 shrink-0" /> {r.location}
+                    </p>
                     <p className="mt-1 text-sm capitalize text-muted-foreground">
-                      {formatDateFR(r.date)} — {r.slot} · {r.hours}h ·{" "}
-                      {(room?.pricePerHour ?? 0) * r.hours} €
+                      {formatDateFR(r.date)} — {r.slot} · {r.hours}h
                     </p>
                     <p className="mt-1 text-sm">
                       {r.confidential ? (
