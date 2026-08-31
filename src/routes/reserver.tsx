@@ -233,7 +233,7 @@ function ReserverPage() {
                       ))}
                     </select>
                   </div>
-                  <div className="mt-4 grid grid-cols-3 gap-2 xs:grid-cols-4 sm:grid-cols-6 lg:grid-cols-8">
+                  <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-8">
 
                     {slots.map(({ time, taken }) => (
                       <button
