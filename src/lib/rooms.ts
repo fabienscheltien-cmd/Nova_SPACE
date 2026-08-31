@@ -112,13 +112,14 @@ export function cancelReservation(id: string) {
 }
 
 export function isSlotTaken(roomId: string, date: string, slot: string) {
-  const start = parseInt(slot, 10);
+  const start = toMinutes(slot);
   return getReservations().some((r) => {
     if (r.roomId !== roomId || r.date !== date) return false;
-    const rStart = parseInt(r.slot, 10);
-    return start >= rStart && start < rStart + r.hours;
+    const rStart = toMinutes(r.slot);
+    return start >= rStart && start < rStart + Math.round(r.hours * 60);
   });
 }
+
 
 export function formatDateFR(iso: string) {
   return new Intl.DateTimeFormat("fr-FR", {
