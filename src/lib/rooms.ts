@@ -160,7 +160,7 @@ export function buildICS(r: Reservation, roomName: string) {
   const title = calendarTitle(r, roomName);
   const description = r.confidential
     ? "Créneau bloqué — détails confidentiels."
-    : `Objet : ${r.subject || "Réunion"}\nRéservé par : ${r.name} (${r.email})\nDurée : ${r.hours}h`;
+    : `Objet : ${r.subject || "Réunion"}\nRéservé par : ${r.name} (${r.email})\nDurée : ${formatDuration(r.hours)}`;
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -197,7 +197,7 @@ export function googleCalendarHref(r: Reservation, roomName: string) {
     location: r.location,
     details: r.confidential
       ? "Créneau bloqué — détails confidentiels."
-      : `Objet : ${r.subject || "Réunion"} | Réservé par : ${r.name} | Durée : ${r.hours}h`,
+      : `Objet : ${r.subject || "Réunion"} | Réservé par : ${r.name} | Durée : ${formatDuration(r.hours)}`,
   });
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
