@@ -133,12 +133,13 @@ export function formatDateFR(iso: string) {
 /** Libellé affiché dans le calendrier (masqué si confidentiel). */
 export function calendarTitle(r: Reservation, roomName: string) {
   if (r.confidential) return `Réservé — ${roomName} (confidentiel)`;
-  return `${r.subject || "Réunion"} — ${r.name} (${r.hours}h)`;
+  return `${r.subject || "Réunion"} — ${r.name} (${formatDuration(r.hours)})`;
 }
 
 function icsDate(date: string, time: string, addHours = 0) {
   const d = new Date(`${date}T${time}:00`);
-  d.setHours(d.getHours() + addHours);
+  d.setMinutes(d.getMinutes() + Math.round(addHours * 60));
+
   return (
     d.getUTCFullYear().toString() +
     String(d.getUTCMonth() + 1).padStart(2, "0") +
