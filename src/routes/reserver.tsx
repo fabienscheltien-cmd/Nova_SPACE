@@ -226,14 +226,15 @@ function ReserverPage() {
                       onChange={(e) => setHours(Number(e.target.value))}
                       className="rounded-lg border border-input bg-card px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                     >
-                      {[1, 2, 3, 4].map((h) => (
+                      {DURATIONS.map((h) => (
                         <option key={h} value={h}>
-                          {h} heure{h > 1 ? "s" : ""}
+                          {formatDuration(h)}
                         </option>
                       ))}
                     </select>
                   </div>
-                  <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-6">
+                  <div className="mt-4 grid grid-cols-3 gap-2 xs:grid-cols-4 sm:grid-cols-6 lg:grid-cols-8">
+
                     {slots.map(({ time, taken }) => (
                       <button
                         type="button"
