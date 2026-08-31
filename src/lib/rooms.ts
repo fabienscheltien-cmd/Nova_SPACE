@@ -83,42 +83,51 @@ export interface Reservation {
   createdAt: string;
 }
 
-const KEY = "zen-reservations";
+export interface OccupiedSlot {
+  slot: string;
+  hours: number;
+}
 
-export function getReservations(): Reservation[] {
+/**
+ * Créneaux de départ impossibles : ceux qui chevaucheraient une réservation
+ * existante (ou qui déborderaient après la fermeture à 20:00).
+ */
+export function computeBlockedSlots(occupied: OccupiedSlot[], durationHours: number) {
+  const ranges = occupied.map((o) => {
+    const start = toMinutes(o.slot);
+    return [start, start + Math.round(o.hours * 60)] as const;
+  });
+  const duration = Math.round(durationHours * 60);
+  const closing = 20 * 60;
+  const blocked = new Set<string>();
+  for (const time of TIME_SLOTS) {
+    const start = toMinutes(time);
+    const end = start + duration;
+    if (end > closing || ranges.some(([s, e]) => start < e && end > s)) blocked.add(time);
+  }
+  return blocked;
+}
+
+const KEY = "zen-reservation-ids";
+
+/** Identifiants des réservations créées depuis ce navigateur. */
+export function getStoredIds(): string[] {
   try {
-    return JSON.parse(localStorage.getItem(KEY) ?? "[]") as Reservation[];
+    const parsed: unknown = JSON.parse(localStorage.getItem(KEY) ?? "[]");
+    return Array.isArray(parsed) ? parsed.filter((v): v is string => typeof v === "string") : [];
   } catch {
     return [];
   }
 }
 
-export function addReservation(r: Omit<Reservation, "id" | "createdAt">) {
-  const reservations = getReservations();
-  const reservation: Reservation = {
-    ...r,
-    id: crypto.randomUUID(),
-    createdAt: new Date().toISOString(),
-  };
-  localStorage.setItem(KEY, JSON.stringify([reservation, ...reservations]));
-  return reservation;
+export function rememberReservation(id: string) {
+  localStorage.setItem(KEY, JSON.stringify([id, ...getStoredIds().filter((x) => x !== id)]));
 }
 
-export function cancelReservation(id: string) {
-  localStorage.setItem(
-    KEY,
-    JSON.stringify(getReservations().filter((r) => r.id !== id)),
-  );
+export function forgetReservation(id: string) {
+  localStorage.setItem(KEY, JSON.stringify(getStoredIds().filter((x) => x !== id)));
 }
 
-export function isSlotTaken(roomId: string, date: string, slot: string) {
-  const start = toMinutes(slot);
-  return getReservations().some((r) => {
-    if (r.roomId !== roomId || r.date !== date) return false;
-    const rStart = toMinutes(r.slot);
-    return start >= rStart && start < rStart + Math.round(r.hours * 60);
-  });
-}
 
 
 export function formatDateFR(iso: string) {
