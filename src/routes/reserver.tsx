@@ -5,6 +5,8 @@ import { Header } from "@/components/Header";
 import {
   ROOMS,
   TIME_SLOTS,
+  DURATIONS,
+  formatDuration,
   addReservation,
   isSlotTaken,
   formatDateFR,
@@ -12,6 +14,7 @@ import {
   googleCalendarHref,
   type Reservation,
 } from "@/lib/rooms";
+
 
 export const Route = createFileRoute("/reserver")({
   validateSearch: (search: Record<string, unknown>): { room?: string } =>
@@ -99,14 +102,14 @@ function ReserverPage() {
             <h1 className="mt-6 text-3xl font-bold">Réservation confirmée</h1>
             <p className="mt-3 text-muted-foreground">
               {room.name} ({room.location}) — {formatDateFR(date)} à {slot},
-              pour {hours}h. Un récapitulatif a été envoyé à {email}.
+              pour {formatDuration(hours)}. Un récapitulatif a été envoyé à {email}.
             </p>
             <div className="mt-6 w-full rounded-xl border border-border bg-background/60 p-4 text-left text-sm">
               <p className="font-semibold">Bloquer le créneau dans l'agenda</p>
               <p className="mt-1 text-xs text-muted-foreground">
                 {confidential
                   ? "L'événement s'affichera comme « Réservé (confidentiel) », sans objet ni nom."
-                  : `L'événement affichera : « ${subject} — ${name} (${hours}h) ».`}
+                  : `L'événement affichera : « ${subject} — ${name} (${formatDuration(hours)}) ».`}
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <a
@@ -223,14 +226,15 @@ function ReserverPage() {
                       onChange={(e) => setHours(Number(e.target.value))}
                       className="rounded-lg border border-input bg-card px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                     >
-                      {[1, 2, 3, 4].map((h) => (
+                      {DURATIONS.map((h) => (
                         <option key={h} value={h}>
-                          {h} heure{h > 1 ? "s" : ""}
+                          {formatDuration(h)}
                         </option>
                       ))}
                     </select>
                   </div>
-                  <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-6">
+                  <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-8">
+
                     {slots.map(({ time, taken }) => (
                       <button
                         type="button"
@@ -323,7 +327,7 @@ function ReserverPage() {
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-muted-foreground">Durée</dt>
-                    <dd className="font-medium">{hours}h</dd>
+                    <dd className="font-medium">{formatDuration(hours)}</dd>
                   </div>
                   <div className="flex justify-between gap-4 border-t border-border pt-3">
                     <dt className="text-muted-foreground">Localisation</dt>

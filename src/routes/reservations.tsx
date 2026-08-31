@@ -9,6 +9,8 @@ import {
   getReservations,
   icsHref,
   googleCalendarHref,
+  formatDuration,
+
 } from "@/lib/rooms";
 
 export const Route = createFileRoute("/reservations")({
@@ -94,7 +96,7 @@ function ReservationsPage() {
                       <MapPin className="size-3.5 shrink-0" /> {r.location}
                     </p>
                     <p className="mt-1 text-sm capitalize text-muted-foreground">
-                      {formatDateFR(r.date)} — {r.slot} · {r.hours}h
+                      {formatDateFR(r.date)} — {r.slot} · {formatDuration(r.hours)}
                     </p>
                     <p className="mt-1 text-sm">
                       {r.confidential ? (

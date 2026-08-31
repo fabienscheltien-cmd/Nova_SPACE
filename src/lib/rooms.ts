@@ -45,20 +45,29 @@ export const ROOMS: Room[] = [
   },
 ];
 
-export const TIME_SLOTS = [
-  "08:00",
-  "09:00",
-  "10:00",
-  "11:00",
-  "12:00",
-  "13:00",
-  "14:00",
-  "15:00",
-  "16:00",
-  "17:00",
-  "18:00",
-  "19:00",
-];
+/** Créneaux toutes les 30 minutes, de 08:00 à 19:30. */
+export const TIME_SLOTS = Array.from({ length: 24 }, (_, i) => {
+  const minutes = 8 * 60 + i * 30;
+  return `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
+});
+
+/** Durées réservables, en heures (pas de 30 minutes). */
+export const DURATIONS = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4];
+
+export function toMinutes(time: string) {
+  const [h = "0", m = "0"] = time.split(":");
+  return parseInt(h, 10) * 60 + parseInt(m, 10);
+}
+
+/** "1h30", "30 min", "2h" */
+export function formatDuration(hours: number) {
+  const total = Math.round(hours * 60);
+  const h = Math.floor(total / 60);
+  const m = total % 60;
+  if (h === 0) return `${m} min`;
+  return m === 0 ? `${h}h` : `${h}h${String(m).padStart(2, "0")}`;
+}
+
 
 export interface Reservation {
   id: string;
@@ -103,13 +112,14 @@ export function cancelReservation(id: string) {
 }
 
 export function isSlotTaken(roomId: string, date: string, slot: string) {
-  const start = parseInt(slot, 10);
+  const start = toMinutes(slot);
   return getReservations().some((r) => {
     if (r.roomId !== roomId || r.date !== date) return false;
-    const rStart = parseInt(r.slot, 10);
-    return start >= rStart && start < rStart + r.hours;
+    const rStart = toMinutes(r.slot);
+    return start >= rStart && start < rStart + Math.round(r.hours * 60);
   });
 }
+
 
 export function formatDateFR(iso: string) {
   return new Intl.DateTimeFormat("fr-FR", {
@@ -123,12 +133,13 @@ export function formatDateFR(iso: string) {
 /** Libellé affiché dans le calendrier (masqué si confidentiel). */
 export function calendarTitle(r: Reservation, roomName: string) {
   if (r.confidential) return `Réservé — ${roomName} (confidentiel)`;
-  return `${r.subject || "Réunion"} — ${r.name} (${r.hours}h)`;
+  return `${r.subject || "Réunion"} — ${r.name} (${formatDuration(r.hours)})`;
 }
 
 function icsDate(date: string, time: string, addHours = 0) {
   const d = new Date(`${date}T${time}:00`);
-  d.setHours(d.getHours() + addHours);
+  d.setMinutes(d.getMinutes() + Math.round(addHours * 60));
+
   return (
     d.getUTCFullYear().toString() +
     String(d.getUTCMonth() + 1).padStart(2, "0") +
@@ -149,7 +160,7 @@ export function buildICS(r: Reservation, roomName: string) {
   const title = calendarTitle(r, roomName);
   const description = r.confidential
     ? "Créneau bloqué — détails confidentiels."
-    : `Objet : ${r.subject || "Réunion"}\nRéservé par : ${r.name} (${r.email})\nDurée : ${r.hours}h`;
+    : `Objet : ${r.subject || "Réunion"}\nRéservé par : ${r.name} (${r.email})\nDurée : ${formatDuration(r.hours)}`;
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -186,7 +197,7 @@ export function googleCalendarHref(r: Reservation, roomName: string) {
     location: r.location,
     details: r.confidential
       ? "Créneau bloqué — détails confidentiels."
-      : `Objet : ${r.subject || "Réunion"} | Réservé par : ${r.name} | Durée : ${r.hours}h`,
+      : `Objet : ${r.subject || "Réunion"} | Réservé par : ${r.name} | Durée : ${formatDuration(r.hours)}`,
   });
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
