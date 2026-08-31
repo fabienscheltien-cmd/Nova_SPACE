@@ -5,6 +5,8 @@ import { Header } from "@/components/Header";
 import {
   ROOMS,
   TIME_SLOTS,
+  DURATIONS,
+  formatDuration,
   addReservation,
   isSlotTaken,
   formatDateFR,
@@ -12,6 +14,7 @@ import {
   googleCalendarHref,
   type Reservation,
 } from "@/lib/rooms";
+
 
 export const Route = createFileRoute("/reserver")({
   validateSearch: (search: Record<string, unknown>): { room?: string } =>
