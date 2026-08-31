@@ -9,6 +9,8 @@ import {
   getReservations,
   icsHref,
   googleCalendarHref,
+  formatDuration,
+
 } from "@/lib/rooms";
 
 export const Route = createFileRoute("/reservations")({
