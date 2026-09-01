@@ -1,17 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { CalendarPlus, CalendarX2, Download, Lock, MapPin, Trash2, Users } from "lucide-react";
 import { Header } from "@/components/Header";
 import {
   ROOMS,
-  cancelReservation,
   formatDateFR,
-  getReservations,
+  formatDuration,
   icsHref,
   googleCalendarHref,
-  formatDuration,
-
+  getStoredIds,
+  forgetReservation,
 } from "@/lib/rooms";
+import { getReservationsByIds, deleteReservation } from "@/lib/reservations.functions";
 
 export const Route = createFileRoute("/reservations")({
   head: () => ({
@@ -34,16 +36,27 @@ export const Route = createFileRoute("/reservations")({
 });
 
 function ReservationsPage() {
-  const [reservations, setReservations] = useState<ReturnType<typeof getReservations>>([]);
+  const [ids, setIds] = useState<string[] | null>(null);
+  const fetchByIds = useServerFn(getReservationsByIds);
+  const removeReservation = useServerFn(deleteReservation);
 
   useEffect(() => {
-    setReservations(getReservations());
+    setIds(getStoredIds());
   }, []);
 
-  function handleCancel(id: string) {
-    cancelReservation(id);
-    setReservations(getReservations());
+  const query = useQuery({
+    queryKey: ["reservations", ids],
+    queryFn: () => fetchByIds({ data: { ids: ids ?? [] } }),
+    enabled: ids !== null,
+  });
+
+  async function handleCancel(id: string) {
+    await removeReservation({ data: { id } });
+    forgetReservation(id);
+    setIds(getStoredIds());
   }
+
+  const reservations = query.data ?? [];
 
   return (
     <div className="min-h-screen">
@@ -57,9 +70,7 @@ function ReservationsPage() {
         {reservations.length === 0 ? (
           <div className="mt-16 flex flex-col items-center rounded-2xl border border-dashed border-border p-16 text-center">
             <CalendarX2 className="size-12 text-muted-foreground" />
-            <p className="mt-4 text-lg font-semibold">
-              Aucune réservation pour le moment
-            </p>
+            <p className="mt-4 text-lg font-semibold">Aucune réservation pour le moment</p>
             <p className="mt-1 text-sm text-muted-foreground">
               Réservez votre première salle en quelques secondes.
             </p>
@@ -74,6 +85,7 @@ function ReservationsPage() {
           <ul className="mt-10 space-y-4">
             {reservations.map((r) => {
               const room = ROOMS.find((x) => x.id === r.roomId);
+              const roomName = room?.name ?? r.roomId;
               const upcoming = r.date >= new Date().toISOString().slice(0, 10);
               return (
                 <li
@@ -91,7 +103,7 @@ function ReservationsPage() {
                     />
                   )}
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold">{room?.name ?? r.roomId}</p>
+                    <p className="font-bold">{roomName}</p>
                     <p className="mt-1 flex items-center gap-1.5 text-xs text-brand-green">
                       <MapPin className="size-3.5 shrink-0" /> {r.location}
                     </p>
@@ -112,36 +124,35 @@ function ReservationsPage() {
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <a
-                        href={icsHref(r, room?.name ?? r.roomId)}
-                        download={`nova-zen-${r.date}-${r.slot.replace(":", "h")}.ics`}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-semibold transition-colors hover:bg-accent"
-                      >
-                        <Download className="size-3.5" /> .ics
-                      </a>
-                      <a
-                        href={googleCalendarHref(r, room?.name ?? r.roomId)}
+                        href={googleCalendarHref(r, roomName)}
                         target="_blank"
                         rel="noreferrer noopener"
                         className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-semibold transition-colors hover:bg-accent"
                       >
                         <CalendarPlus className="size-3.5" /> Google Agenda
                       </a>
+                      <a
+                        href={icsHref(r, roomName)}
+                        download={`nova-zen-${r.date}-${r.slot.replace(":", "h")}.ics`}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-semibold transition-colors hover:bg-accent"
+                      >
+                        <Download className="size-3.5" /> .ics
+                      </a>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                        upcoming
-                          ? "bg-primary/15 text-primary"
-                          : "bg-muted text-muted-foreground"
+                        upcoming ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
                       }`}
                     >
-                      {upcoming ? "À venir" : "Terminée"}
+                      {upcoming ? "À venir" : "Passée"}
                     </span>
                     <button
+                      type="button"
                       onClick={() => handleCancel(r.id)}
-                      aria-label="Annuler cette réservation"
-                      className="flex size-9 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
+                      aria-label="Annuler la réservation"
+                      className="rounded-lg border border-border p-2 text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
                     >
                       <Trash2 className="size-4" />
                     </button>
@@ -154,8 +165,7 @@ function ReservationsPage() {
 
         <p className="mt-10 flex items-center gap-2 text-sm text-muted-foreground">
           <Users className="size-4" />
-          Besoin d'une configuration spéciale ? Écrivez-nous à
-          contact@nova-serenity.fr
+          Besoin d'une configuration spéciale ? Écrivez-nous à contact@nova-serenity.fr
         </p>
       </main>
     </div>
