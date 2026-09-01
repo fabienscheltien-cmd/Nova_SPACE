@@ -79,7 +79,7 @@ function ConfirmationPage() {
             <div className="mt-8 rounded-2xl border border-border bg-card p-6">
               <dl className="space-y-3 text-sm">
                 <Row label="Salle" value={roomName} />
-                <Row label="Date" value={formatDateFR(r.date)} />
+                <Row label="Date" value={formatDateFR(r.date)} capitalize />
                 <Row label="Créneau" value={`${r.slot} · ${formatDuration(r.hours)}`} />
                 <Row label="Réservé par" value={`${r.name} · ${r.email}`} />
                 <Row
@@ -135,11 +135,11 @@ function ConfirmationPage() {
   );
 }
 
-function Row({ label, value }: { label: string; value: string }) {
+function Row({ label, value, capitalize }: { label: string; value: string; capitalize?: boolean }) {
   return (
     <div className="flex justify-between gap-4">
       <dt className="text-muted-foreground">{label}</dt>
-      <dd className="text-right font-medium capitalize">{value}</dd>
+      <dd className={`text-right font-medium ${capitalize ? "capitalize" : ""}`}>{value}</dd>
     </div>
   );
 }
