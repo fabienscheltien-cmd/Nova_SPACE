@@ -14,8 +14,203 @@ export type Database = {
   }
   public: {
     Tables: {
+      allowed_domains: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          domain: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          domain: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          domain?: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "allowed_domains_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_settings: {
+        Row: {
+          created_at: string
+          id: boolean
+          monthly_pool_hours: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: boolean
+          monthly_pool_hours?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: boolean
+          monthly_pool_hours?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      companies: {
+        Row: {
+          created_at: string
+          domain: string
+          id: string
+          name: string
+          share_percent: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          domain: string
+          id?: string
+          name: string
+          share_percent?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          domain?: string
+          id?: string
+          name?: string
+          share_percent?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      overage_requests: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          message: string | null
+          requested_hours: number
+          requester_email: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          requested_hours: number
+          requester_email: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          requested_hours?: number
+          requester_email?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "overage_requests_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quota_adjustments: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          hours: number
+          id: string
+          month: string
+          note: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          hours: number
+          id?: string
+          month: string
+          note?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          hours?: number
+          id?: string
+          month?: string
+          note?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quota_adjustments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reservations: {
         Row: {
+          company_id: string | null
           confidential: boolean
           created_at: string
           date: string
@@ -30,8 +225,10 @@ export type Database = {
           slot: string
           starts_at: string
           subject: string
+          user_id: string | null
         }
         Insert: {
+          company_id?: string | null
           confidential?: boolean
           created_at?: string
           date: string
@@ -46,8 +243,10 @@ export type Database = {
           slot: string
           starts_at: string
           subject: string
+          user_id?: string | null
         }
         Update: {
+          company_id?: string | null
           confidential?: boolean
           created_at?: string
           date?: string
@@ -62,6 +261,36 @@ export type Database = {
           slot?: string
           starts_at?: string
           subject?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -70,10 +299,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      current_company_id: { Args: never; Returns: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "locataire"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -200,6 +436,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "locataire"],
+    },
   },
 } as const
