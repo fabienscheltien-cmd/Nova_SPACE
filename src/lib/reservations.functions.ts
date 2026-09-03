@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const availabilityInput = z.object({
   roomId: z.string().min(1),
@@ -30,10 +31,13 @@ export type ReservationRow = {
   subject: string;
   confidential: boolean;
   createdAt: string;
+  companyId: string | null;
+  userId: string | null;
 };
 
 /** Plages occupées d'une salle pour une journée, sans aucune donnée personnelle. */
 export const getAvailability = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => availabilityInput.parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -47,10 +51,40 @@ export const getAvailability = createServerFn({ method: "POST" })
   });
 
 export const createReservation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => createInput.parse(input))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { toIsoRange } = await import("@/lib/reservation-time");
+    const { computeQuota } = await import("@/lib/quota.server");
+
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("company_id")
+      .eq("id", context.userId)
+      .maybeSingle();
+
+    const companyId = profile?.company_id ?? null;
+
+    if (!isAdmin) {
+      if (!companyId) throw new Error("Aucune entreprise rattachée à ce compte.");
+      const { data: company } = await supabaseAdmin
+        .from("companies")
+        .select("id, share_percent")
+        .eq("id", companyId)
+        .maybeSingle();
+      if (!company) throw new Error("Entreprise introuvable.");
+      const quota = await computeQuota(supabaseAdmin, company);
+      if (quota.remainingHours < data.hours) {
+        return { ok: false as const, reason: "quota" as const, remaining: quota.remainingHours };
+      }
+    }
+
     const { startsAt, endsAt } = toIsoRange(data.date, data.slot, data.hours);
 
     const { data: row, error } = await supabaseAdmin
@@ -67,6 +101,8 @@ export const createReservation = createServerFn({ method: "POST" })
         email: data.email,
         subject: data.subject,
         confidential: data.confidential,
+        company_id: companyId,
+        user_id: context.userId,
       })
       .select("*")
       .single();
@@ -83,7 +119,10 @@ export const createReservation = createServerFn({ method: "POST" })
   });
 
 export const getReservationsByIds = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => z.object({ ids: z.array(z.string().uuid()).max(200) }).parse(input))
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ ids: z.array(z.string().uuid()).max(200) }).parse(input),
+  )
   .handler(async ({ data }) => {
     if (data.ids.length === 0) return [] as ReservationRow[];
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -96,10 +135,57 @@ export const getReservationsByIds = createServerFn({ method: "POST" })
     return (rows ?? []).map(mapRow);
   });
 
-export const deleteReservation = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
-  .handler(async ({ data }) => {
+/** Réservations de l'entreprise de l'utilisateur connecté. */
+export const getMyReservations = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<ReservationRow[]> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("company_id")
+      .eq("id", context.userId)
+      .maybeSingle();
+
+    const query = supabaseAdmin.from("reservations").select("*").order("starts_at", {
+      ascending: false,
+    });
+    const { data: rows, error } = profile?.company_id
+      ? await query.eq("company_id", profile.company_id)
+      : await query.eq("user_id", context.userId);
+    if (error) throw new Error(error.message);
+    return (rows ?? []).map(mapRow);
+  });
+
+export const deleteReservation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+
+    const { data: row } = await supabaseAdmin
+      .from("reservations")
+      .select("id, user_id, company_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!row) return { ok: true as const };
+
+    if (!isAdmin) {
+      const { data: profile } = await supabaseAdmin
+        .from("profiles")
+        .select("company_id")
+        .eq("id", context.userId)
+        .maybeSingle();
+      const sameCompany =
+        row.company_id != null && profile?.company_id === row.company_id;
+      if (row.user_id !== context.userId && !sameCompany) {
+        throw new Error("Suppression non autorisée.");
+      }
+    }
+
     const { error } = await supabaseAdmin.from("reservations").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true as const };
@@ -120,5 +206,7 @@ function mapRow(row: DbRow): ReservationRow {
     subject: String(row["subject"]),
     confidential: Boolean(row["confidential"]),
     createdAt: String(row["created_at"]),
+    companyId: row["company_id"] ? String(row["company_id"]) : null,
+    userId: row["user_id"] ? String(row["user_id"]) : null,
   };
 }
