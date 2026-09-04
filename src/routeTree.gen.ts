@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedReservationsRouteImport } from './routes/_authenticated/reservations'
 import { Route as AuthenticatedReserverRouteImport } from './routes/_authenticated/reserver'
 import { Route as AuthenticatedConfirmationIdRouteImport } from './routes/_authenticated/confirmation.$id'
@@ -19,22 +20,26 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedReservationsRoute =
   AuthenticatedReservationsRouteImport.update({
-    id: '/_authenticated/reservations',
+    id: '/reservations',
     path: '/reservations',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedReserverRoute = AuthenticatedReserverRouteImport.update({
-  id: '/_authenticated/reserver',
+  id: '/reserver',
   path: '/reserver',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedConfirmationIdRoute =
   AuthenticatedConfirmationIdRouteImport.update({
-    id: '/_authenticated/confirmation/$id',
+    id: '/confirmation/$id',
     path: '/confirmation/$id',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -52,6 +57,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_authenticated/reservations': typeof AuthenticatedReservationsRoute
   '/_authenticated/reserver': typeof AuthenticatedReserverRoute
   '/_authenticated/confirmation/$id': typeof AuthenticatedConfirmationIdRoute
@@ -64,6 +70,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/_authenticated/reservations'
     | '/_authenticated/reserver'
     | '/_authenticated/confirmation/$id'
@@ -71,9 +78,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthenticatedReservationsRoute: typeof AuthenticatedReservationsRoute
-  AuthenticatedReserverRoute: typeof AuthenticatedReserverRoute
-  AuthenticatedConfirmationIdRoute: typeof AuthenticatedConfirmationIdRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -85,35 +90,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/reservations': {
       id: '/_authenticated/reservations'
       path: '/reservations'
       fullPath: '/reservations'
       preLoaderRoute: typeof AuthenticatedReservationsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/reserver': {
       id: '/_authenticated/reserver'
       path: '/reserver'
       fullPath: '/reserver'
       preLoaderRoute: typeof AuthenticatedReserverRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/confirmation/$id': {
       id: '/_authenticated/confirmation/$id'
       path: '/confirmation/$id'
       fullPath: '/confirmation/$id'
       preLoaderRoute: typeof AuthenticatedConfirmationIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedReservationsRoute: typeof AuthenticatedReservationsRoute
+  AuthenticatedReserverRoute: typeof AuthenticatedReserverRoute
+  AuthenticatedConfirmationIdRoute: typeof AuthenticatedConfirmationIdRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReservationsRoute: AuthenticatedReservationsRoute,
   AuthenticatedReserverRoute: AuthenticatedReserverRoute,
   AuthenticatedConfirmationIdRoute: AuthenticatedConfirmationIdRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
