@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedReservationsRouteImport } from './routes/_authenticated/reservations'
 import { Route as AuthenticatedReserverRouteImport } from './routes/_authenticated/reserver'
 import { Route as AuthenticatedConfirmationIdRouteImport } from './routes/_authenticated/confirmation.$id'
@@ -22,6 +23,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedReservationsRoute =
@@ -44,12 +50,14 @@ const AuthenticatedConfirmationIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/reservations': typeof AuthenticatedReservationsRoute
   '/reserver': typeof AuthenticatedReserverRoute
   '/confirmation/$id': typeof AuthenticatedConfirmationIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/reservations': typeof AuthenticatedReservationsRoute
   '/reserver': typeof AuthenticatedReserverRoute
   '/confirmation/$id': typeof AuthenticatedConfirmationIdRoute
@@ -58,19 +66,21 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/_authenticated/reservations': typeof AuthenticatedReservationsRoute
   '/_authenticated/reserver': typeof AuthenticatedReserverRoute
   '/_authenticated/confirmation/$id': typeof AuthenticatedConfirmationIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/reservations' | '/reserver' | '/confirmation/$id'
+  fullPaths: '/' | '/auth' | '/reservations' | '/reserver' | '/confirmation/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/reservations' | '/reserver' | '/confirmation/$id'
+  to: '/' | '/auth' | '/reservations' | '/reserver' | '/confirmation/$id'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/auth'
     | '/_authenticated/reservations'
     | '/_authenticated/reserver'
     | '/_authenticated/confirmation/$id'
@@ -79,6 +89,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -95,6 +106,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/reservations': {
@@ -139,6 +157,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
