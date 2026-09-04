@@ -13,7 +13,7 @@ import {
 } from "@/lib/rooms";
 import { getReservationsByIds } from "@/lib/reservations.functions";
 
-export const Route = createFileRoute("/confirmation/$id")({
+export const Route = createFileRoute("/_authenticated/confirmation/$id")({
   head: () => ({
     meta: [
       { title: "Réservation confirmée — Nova Zen Space" },

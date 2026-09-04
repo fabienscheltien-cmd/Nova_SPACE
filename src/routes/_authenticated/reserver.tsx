@@ -15,7 +15,7 @@ import {
 } from "@/lib/rooms";
 import { getAvailability, createReservation } from "@/lib/reservations.functions";
 
-export const Route = createFileRoute("/reserver")({
+export const Route = createFileRoute("/_authenticated/reserver")({
   validateSearch: (search: Record<string, unknown>): { room?: string } =>
     typeof search["room"] === "string" ? { room: search["room"] as string } : {},
   head: () => ({

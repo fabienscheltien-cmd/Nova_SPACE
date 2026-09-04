@@ -15,7 +15,7 @@ import {
 } from "@/lib/rooms";
 import { getReservationsByIds, deleteReservation } from "@/lib/reservations.functions";
 
-export const Route = createFileRoute("/reservations")({
+export const Route = createFileRoute("/_authenticated/reservations")({
   head: () => ({
     meta: [
       { title: "Mes réservations — Nova Zen Space" },
