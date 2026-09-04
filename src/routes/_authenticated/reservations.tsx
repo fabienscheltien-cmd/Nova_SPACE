@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 import { CalendarPlus, CalendarX2, Download, Lock, MapPin, Trash2, Users } from "lucide-react";
 import { Header } from "@/components/Header";
 import {
@@ -10,12 +9,11 @@ import {
   formatDuration,
   icsHref,
   googleCalendarHref,
-  getStoredIds,
   forgetReservation,
 } from "@/lib/rooms";
-import { getReservationsByIds, deleteReservation } from "@/lib/reservations.functions";
+import { getMyReservations, deleteReservation } from "@/lib/reservations.functions";
 
-export const Route = createFileRoute("/reservations")({
+export const Route = createFileRoute("/_authenticated/reservations")({
   head: () => ({
     meta: [
       { title: "Mes réservations — Nova Zen Space" },
@@ -36,27 +34,22 @@ export const Route = createFileRoute("/reservations")({
 });
 
 function ReservationsPage() {
-  const [ids, setIds] = useState<string[] | null>(null);
-  const fetchByIds = useServerFn(getReservationsByIds);
+  const fetchMine = useServerFn(getMyReservations);
   const removeReservation = useServerFn(deleteReservation);
 
-  useEffect(() => {
-    setIds(getStoredIds());
-  }, []);
-
   const query = useQuery({
-    queryKey: ["reservations", ids],
-    queryFn: () => fetchByIds({ data: { ids: ids ?? [] } }),
-    enabled: ids !== null,
+    queryKey: ["my-reservations"],
+    queryFn: () => fetchMine(),
   });
 
   async function handleCancel(id: string) {
     await removeReservation({ data: { id } });
     forgetReservation(id);
-    setIds(getStoredIds());
+    await query.refetch();
   }
 
   const reservations = query.data ?? [];
+
 
   return (
     <div className="min-h-screen">
