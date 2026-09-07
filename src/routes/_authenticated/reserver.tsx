@@ -87,7 +87,7 @@ function ReserverPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!slot || !name || !email || !subject || submitting) return;
+    if (!slot || !name || !email || !subject || submitting || quotaBlocked) return;
     setSubmitting(true);
     setError(null);
     try {
@@ -105,6 +105,13 @@ function ReserverPage() {
         },
       });
       if (!result.ok) {
+        if (result.reason === "quota") {
+          setError(
+            `Solde d'heures insuffisant : il reste ${formatDuration(result.remaining)} ce mois-ci.`,
+          );
+          await me.refetch();
+          return;
+        }
         setError(
           "Ce créneau vient d'être réservé par quelqu'un d'autre. Choisissez un autre horaire.",
         );
@@ -112,6 +119,7 @@ function ReserverPage() {
         await availability.refetch();
         return;
       }
+      await me.refetch();
       rememberReservation(result.reservation.id);
       await navigate({ to: "/confirmation/$id", params: { id: result.reservation.id } });
     } catch {
