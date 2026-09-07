@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Users, Clock, MapPin } from "lucide-react";
+import { ArrowRight, Users, MapPin } from "lucide-react";
 import hero from "@/assets/hero.jpg";
 import { ROOMS } from "@/lib/rooms";
 import { Header } from "@/components/Header";
