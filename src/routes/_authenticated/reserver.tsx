@@ -55,11 +55,16 @@ function ReserverPage() {
   const [confidential, setConfidential] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [overageSent, setOverageSent] = useState(false);
 
   const fetchAvailability = useServerFn(getAvailability);
   const submitReservation = useServerFn(createReservation);
+  const fetchMe = useServerFn(getMe);
+  const askOverage = useServerFn(requestOverage);
 
   const room = ROOMS.find((r) => r.id === roomId) ?? ROOMS[0]!;
+
+  const me = useQuery({ queryKey: ["me"], queryFn: () => fetchMe() });
 
   const availability = useQuery({
     queryKey: ["availability", roomId, date],
@@ -70,6 +75,15 @@ function ReserverPage() {
     () => computeBlockedSlots(availability.data ?? [], hours),
     [availability.data, hours],
   );
+
+  const isAdmin = me.data?.role === "admin";
+  const remaining = me.data?.quota?.remainingHours ?? null;
+  const quotaBlocked = !isAdmin && remaining !== null && remaining < hours;
+
+  useEffect(() => {
+    if (me.data && !me.data.allowed) void navigate({ to: "/auth" });
+  }, [me.data, navigate]);
+
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
