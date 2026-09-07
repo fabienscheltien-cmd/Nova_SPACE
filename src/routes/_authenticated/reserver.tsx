@@ -340,10 +340,50 @@ function ReserverPage() {
                 <dt className="text-muted-foreground">Localisation</dt>
                 <dd className="text-right font-medium">{room.location}</dd>
               </div>
+              {remaining !== null && (
+                <div className="flex justify-between gap-4 border-t border-border pt-3">
+                  <dt className="text-muted-foreground">Heures restantes</dt>
+                  <dd
+                    className={`text-right font-semibold ${
+                      quotaBlocked ? "text-destructive" : "text-brand-green"
+                    }`}
+                  >
+                    {formatDuration(Math.max(remaining, 0))}
+                  </dd>
+                </div>
+              )}
             </dl>
+
+            {quotaBlocked && (
+              <div className="mt-5 rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm">
+                <p className="font-semibold text-destructive">Solde insuffisant</p>
+                <p className="mt-1 text-muted-foreground">
+                  Le quota de {me.data?.company?.name ?? "votre entreprise"} ne couvre pas cette
+                  durée ce mois-ci.
+                </p>
+                <button
+                  type="button"
+                  disabled={overageSent}
+                  onClick={async () => {
+                    await askOverage({
+                      data: {
+                        hours,
+                        message: `${room.name} — ${formatDateFR(date)} ${slot ?? ""}`,
+                      },
+                    });
+                    setOverageSent(true);
+                  }}
+                  className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-accent disabled:opacity-60"
+                >
+                  <HandCoins className="size-4" />
+                  {overageSent ? "Demande envoyée" : "Demander un dépassement à l'administrateur"}
+                </button>
+              </div>
+            )}
+
             <button
               type="submit"
-              disabled={!slot || !name || !email || !subject || submitting}
+              disabled={!slot || !name || !email || !subject || submitting || quotaBlocked}
               className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-transform enabled:hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-40"
             >
               {submitting ? "Enregistrement…" : "Confirmer la réservation"}
