@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Users, Clock, MapPin } from "lucide-react";
+import { ArrowRight, Users, MapPin } from "lucide-react";
 import hero from "@/assets/hero.jpg";
 import { ROOMS } from "@/lib/rooms";
 import { Header } from "@/components/Header";
@@ -120,26 +120,6 @@ function Index() {
         </div>
       </section>
 
-      {/* Bandeau */}
-      <section className="border-t border-border">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 py-16 text-center sm:px-6 sm:py-20">
-          <Clock className="size-10 text-primary" />
-          <h2 className="max-w-2xl text-3xl font-bold tracking-tight md:text-4xl">
-            Ouvert 7j/7, de 8h à 20h
-          </h2>
-          <p className="max-w-xl text-muted-foreground">
-            Réservation gratuite pour les équipes : aucune facturation, juste
-            un créneau bloqué à votre nom.
-          </p>
-          <Link
-            to="/reserver"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 sm:px-8 font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition-transform hover:scale-[1.03]"
-          >
-            Réserver maintenant
-            <ArrowRight className="size-5" />
-          </Link>
-        </div>
-      </section>
 
       <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
         NOVA ZEN SPACE — Vos réunions, en toute sérénité.

@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { AlertTriangle, ArrowRight, Lock, MapPin, Users } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { AlertTriangle, ArrowRight, HandCoins, Lock, MapPin, Users } from "lucide-react";
 import { Header } from "@/components/Header";
 import {
   ROOMS,
@@ -14,6 +14,7 @@ import {
   rememberReservation,
 } from "@/lib/rooms";
 import { getAvailability, createReservation } from "@/lib/reservations.functions";
+import { getMe, requestOverage } from "@/lib/account.functions";
 
 export const Route = createFileRoute("/_authenticated/reserver")({
   validateSearch: (search: Record<string, unknown>): { room?: string } =>
@@ -54,11 +55,16 @@ function ReserverPage() {
   const [confidential, setConfidential] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [overageSent, setOverageSent] = useState(false);
 
   const fetchAvailability = useServerFn(getAvailability);
   const submitReservation = useServerFn(createReservation);
+  const fetchMe = useServerFn(getMe);
+  const askOverage = useServerFn(requestOverage);
 
   const room = ROOMS.find((r) => r.id === roomId) ?? ROOMS[0]!;
+
+  const me = useQuery({ queryKey: ["me"], queryFn: () => fetchMe() });
 
   const availability = useQuery({
     queryKey: ["availability", roomId, date],
@@ -70,9 +76,18 @@ function ReserverPage() {
     [availability.data, hours],
   );
 
+  const isAdmin = me.data?.role === "admin";
+  const remaining = me.data?.quota?.remainingHours ?? null;
+  const quotaBlocked = !isAdmin && remaining !== null && remaining < hours;
+
+  useEffect(() => {
+    if (me.data && !me.data.allowed) void navigate({ to: "/auth" });
+  }, [me.data, navigate]);
+
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!slot || !name || !email || !subject || submitting) return;
+    if (!slot || !name || !email || !subject || submitting || quotaBlocked) return;
     setSubmitting(true);
     setError(null);
     try {
@@ -90,6 +105,13 @@ function ReserverPage() {
         },
       });
       if (!result.ok) {
+        if (result.reason === "quota") {
+          setError(
+            `Solde d'heures insuffisant : il reste ${formatDuration(result.remaining)} ce mois-ci.`,
+          );
+          await me.refetch();
+          return;
+        }
         setError(
           "Ce créneau vient d'être réservé par quelqu'un d'autre. Choisissez un autre horaire.",
         );
@@ -97,6 +119,7 @@ function ReserverPage() {
         await availability.refetch();
         return;
       }
+      await me.refetch();
       rememberReservation(result.reservation.id);
       await navigate({ to: "/confirmation/$id", params: { id: result.reservation.id } });
     } catch {
@@ -317,10 +340,50 @@ function ReserverPage() {
                 <dt className="text-muted-foreground">Localisation</dt>
                 <dd className="text-right font-medium">{room.location}</dd>
               </div>
+              {remaining !== null && (
+                <div className="flex justify-between gap-4 border-t border-border pt-3">
+                  <dt className="text-muted-foreground">Heures restantes</dt>
+                  <dd
+                    className={`text-right font-semibold ${
+                      quotaBlocked ? "text-destructive" : "text-brand-green"
+                    }`}
+                  >
+                    {formatDuration(Math.max(remaining, 0))}
+                  </dd>
+                </div>
+              )}
             </dl>
+
+            {quotaBlocked && (
+              <div className="mt-5 rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm">
+                <p className="font-semibold text-destructive">Solde insuffisant</p>
+                <p className="mt-1 text-muted-foreground">
+                  Le quota de {me.data?.company?.name ?? "votre entreprise"} ne couvre pas cette
+                  durée ce mois-ci.
+                </p>
+                <button
+                  type="button"
+                  disabled={overageSent}
+                  onClick={async () => {
+                    await askOverage({
+                      data: {
+                        hours,
+                        message: `${room.name} — ${formatDateFR(date)} ${slot ?? ""}`,
+                      },
+                    });
+                    setOverageSent(true);
+                  }}
+                  className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-accent disabled:opacity-60"
+                >
+                  <HandCoins className="size-4" />
+                  {overageSent ? "Demande envoyée" : "Demander un dépassement à l'administrateur"}
+                </button>
+              </div>
+            )}
+
             <button
               type="submit"
-              disabled={!slot || !name || !email || !subject || submitting}
+              disabled={!slot || !name || !email || !subject || submitting || quotaBlocked}
               className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-transform enabled:hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-40"
             >
               {submitting ? "Enregistrement…" : "Confirmer la réservation"}
