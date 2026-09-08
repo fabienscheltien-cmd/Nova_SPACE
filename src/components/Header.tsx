@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { CalendarDays, LayoutList, LogIn, LogOut, ShieldCheck } from "lucide-react";
 import logoSerenity from "@/assets/nova-serenity.png.asset.json";
+import logoNova from "@/assets/nova-only.png.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 import { getMe } from "@/lib/account.functions";
