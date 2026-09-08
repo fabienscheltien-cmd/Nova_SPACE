@@ -47,14 +47,14 @@ export function Header() {
 
         <Link
           to="/"
-          className="flex min-w-0 items-center justify-center gap-1.5 sm:gap-2"
+          className="flex min-w-0 items-baseline justify-center gap-1.5 sm:gap-2"
           aria-label="Nova Space — accueil"
         >
           <span className="font-display text-lg font-extrabold uppercase leading-none tracking-[0.04em] text-brand-blue sm:text-[1.45rem] lg:text-[1.7rem]">
             Nova
           </span>
-          <span className="font-display text-lg font-extrabold uppercase leading-none tracking-[0.04em] text-brand-green sm:text-[1.45rem] lg:text-[1.7rem]">
-            Space
+          <span className="font-display text-lg font-extrabold uppercase leading-none tracking-[0.04em] text-brand-orange sm:text-[1.45rem] lg:text-[1.7rem]">
+            SPACE
           </span>
         </Link>
 

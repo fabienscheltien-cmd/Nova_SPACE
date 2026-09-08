@@ -34,15 +34,17 @@
   --color-ring-offset-background: var(--background);
   --color-brand-green: var(--brand-green);
   --color-brand-blue: var(--brand-blue);
+  --color-brand-orange: var(--brand-orange);
   --font-display: "Outfit", sans-serif;
   --font-sans: "Figtree", sans-serif;
 }
 
 :root {
   --radius: 0.75rem;
-  /* Charte Nova Serenity — bleu #2569a8, vert #7eb8a2, nuit #071424 */
+  /* Charte Nova Serenity — bleu #2569a8, vert #7eb8a2, orange pastel #F4A261, nuit #071424 */
   --brand-blue: #2569a8;
   --brand-green: #7eb8a2;
+  --brand-orange: #F4A261;
   --background: #071424;
   --foreground: #eef4fa;
   --card: #0e2036;
