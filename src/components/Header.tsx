@@ -47,18 +47,13 @@ export function Header() {
 
         <Link
           to="/"
-          className="flex min-w-0 items-center justify-center gap-2"
-          aria-label="Nova Zen Space — accueil"
+          className="flex min-w-0 items-center justify-center gap-1.5 sm:gap-2"
+          aria-label="Nova Space — accueil"
         >
-          <img
-            src={logoZenSpace.url}
-            alt="Logo Nova Zen"
-            width={2861}
-            height={672}
-            decoding="async"
-            className="h-7 w-auto max-w-full object-contain sm:h-9 lg:h-10"
-          />
-          <span className="font-display text-lg font-extrabold uppercase leading-none tracking-[0.04em] text-[#7eb8a2] sm:text-[1.45rem] lg:text-[1.7rem]">
+          <span className="font-display text-lg font-extrabold uppercase leading-none tracking-[0.04em] text-brand-blue sm:text-[1.45rem] lg:text-[1.7rem]">
+            Nova
+          </span>
+          <span className="font-display text-lg font-extrabold uppercase leading-none tracking-[0.04em] text-brand-green sm:text-[1.45rem] lg:text-[1.7rem]">
             Space
           </span>
         </Link>
