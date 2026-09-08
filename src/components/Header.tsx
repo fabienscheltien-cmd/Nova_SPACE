@@ -54,10 +54,10 @@ export function Header() {
           <img
             src={logoNova.url}
             alt="Nova"
-            width={2861}
-            height={672}
+            width={2424}
+            height={816}
             decoding="async"
-            className="h-7 w-auto sm:h-9 lg:h-10"
+            className="h-[1.5rem] w-auto sm:h-[1.9rem] lg:h-[2.2rem]"
           />
           <span className="font-display text-[1.15rem] font-extrabold uppercase leading-none tracking-[0.04em] text-brand-orange sm:text-[1.45rem] lg:text-[1.7rem]">
             SPACE
