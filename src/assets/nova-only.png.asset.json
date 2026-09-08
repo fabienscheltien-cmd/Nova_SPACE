@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "asset_id": "09162f73-0215-4c02-b7bb-c346b849564d",
+  "asset_id": "575a8328-5696-4e05-8234-bb80a58d4fa7",
   "project_id": "22931e00-eb4a-4823-ad51-a7952733108b",
-  "url": "/__l5e/assets-v1/09162f73-0215-4c02-b7bb-c346b849564d/nova-only.png",
-  "r2_key": "a/v1/22931e00-eb4a-4823-ad51-a7952733108b/09162f73-0215-4c02-b7bb-c346b849564d/nova-only.png",
-  "original_filename": "nova-only.png",
-  "size": 645255,
+  "url": "/__l5e/assets-v1/575a8328-5696-4e05-8234-bb80a58d4fa7/nova-logo.png",
+  "r2_key": "a/v1/22931e00-eb4a-4823-ad51-a7952733108b/575a8328-5696-4e05-8234-bb80a58d4fa7/nova-logo.png",
+  "original_filename": "nova-logo.png",
+  "size": 604570,
   "content_type": "image/png",
-  "created_at": "2026-09-08T13:35:51Z"
+  "created_at": "2026-09-08T13:39:24Z"
 }
