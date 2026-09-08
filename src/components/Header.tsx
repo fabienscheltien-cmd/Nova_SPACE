@@ -3,7 +3,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { CalendarDays, LayoutList, LogIn, LogOut, ShieldCheck } from "lucide-react";
 import logoSerenity from "@/assets/nova-serenity.png.asset.json";
-import logoZenSpace from "@/assets/nova-zen-space.png.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 import { getMe } from "@/lib/account.functions";
@@ -48,18 +47,13 @@ export function Header() {
 
         <Link
           to="/"
-          className="flex min-w-0 items-center justify-center gap-2"
-          aria-label="Nova Zen Space — accueil"
+          className="flex min-w-0 items-center justify-center gap-1.5 sm:gap-2"
+          aria-label="Nova Space — accueil"
         >
-          <img
-            src={logoZenSpace.url}
-            alt="Logo Nova Zen"
-            width={2861}
-            height={672}
-            decoding="async"
-            className="h-7 w-auto max-w-full object-contain sm:h-9 lg:h-10"
-          />
-          <span className="font-display text-lg font-extrabold uppercase leading-none tracking-[0.04em] text-[#7eb8a2] sm:text-[1.45rem] lg:text-[1.7rem]">
+          <span className="font-display text-lg font-extrabold uppercase leading-none tracking-[0.04em] text-brand-blue sm:text-[1.45rem] lg:text-[1.7rem]">
+            Nova
+          </span>
+          <span className="font-display text-lg font-extrabold uppercase leading-none tracking-[0.04em] text-brand-green sm:text-[1.45rem] lg:text-[1.7rem]">
             Space
           </span>
         </Link>
