@@ -74,6 +74,14 @@ export function Header() {
             <span className="hidden sm:inline">Réserver</span>
           </Link>
           <Link
+            to="/planning"
+            className="flex items-center gap-2 rounded-md px-2.5 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:px-3"
+            activeProps={{ className: "text-foreground bg-accent" }}
+          >
+            <CalendarClock className="size-4 shrink-0" />
+            <span className="hidden sm:inline">Planning</span>
+          </Link>
+          <Link
             to="/reservations"
             className="flex items-center gap-2 rounded-md px-2.5 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:px-3"
             activeProps={{ className: "text-foreground bg-accent" }}
