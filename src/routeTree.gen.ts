@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedPlanningRouteImport } from './routes/_authenticated/planning'
 import { Route as AuthenticatedReservationsRouteImport } from './routes/_authenticated/reservations'
 import { Route as AuthenticatedReserverRouteImport } from './routes/_authenticated/reserver'
 import { Route as AuthenticatedConfirmationIdRouteImport } from './routes/_authenticated/confirmation.$id'
@@ -34,6 +35,11 @@ const AuthRoute = AuthRouteImport.update({
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPlanningRoute = AuthenticatedPlanningRouteImport.update({
+  id: '/planning',
+  path: '/planning',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedReservationsRoute =
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/planning': typeof AuthenticatedPlanningRoute
   '/reservations': typeof AuthenticatedReservationsRoute
   '/reserver': typeof AuthenticatedReserverRoute
   '/confirmation/$id': typeof AuthenticatedConfirmationIdRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/planning': typeof AuthenticatedPlanningRoute
   '/reservations': typeof AuthenticatedReservationsRoute
   '/reserver': typeof AuthenticatedReserverRoute
   '/confirmation/$id': typeof AuthenticatedConfirmationIdRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/planning': typeof AuthenticatedPlanningRoute
   '/_authenticated/reservations': typeof AuthenticatedReservationsRoute
   '/_authenticated/reserver': typeof AuthenticatedReserverRoute
   '/_authenticated/confirmation/$id': typeof AuthenticatedConfirmationIdRoute
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
+    | '/planning'
     | '/reservations'
     | '/reserver'
     | '/confirmation/$id'
@@ -94,6 +104,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
+    | '/planning'
     | '/reservations'
     | '/reserver'
     | '/confirmation/$id'
@@ -103,6 +114,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/admin'
+    | '/_authenticated/planning'
     | '/_authenticated/reservations'
     | '/_authenticated/reserver'
     | '/_authenticated/confirmation/$id'
@@ -144,6 +156,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/planning': {
+      id: '/_authenticated/planning'
+      path: '/planning'
+      fullPath: '/planning'
+      preLoaderRoute: typeof AuthenticatedPlanningRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/reservations': {
       id: '/_authenticated/reservations'
       path: '/reservations'
@@ -170,6 +189,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedPlanningRoute: typeof AuthenticatedPlanningRoute
   AuthenticatedReservationsRoute: typeof AuthenticatedReservationsRoute
   AuthenticatedReserverRoute: typeof AuthenticatedReserverRoute
   AuthenticatedConfirmationIdRoute: typeof AuthenticatedConfirmationIdRoute
@@ -177,6 +197,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedPlanningRoute: AuthenticatedPlanningRoute,
   AuthenticatedReservationsRoute: AuthenticatedReservationsRoute,
   AuthenticatedReserverRoute: AuthenticatedReserverRoute,
   AuthenticatedConfirmationIdRoute: AuthenticatedConfirmationIdRoute,
