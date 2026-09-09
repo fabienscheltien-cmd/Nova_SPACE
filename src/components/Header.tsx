@@ -1,7 +1,14 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CalendarDays, LayoutList, LogIn, LogOut, ShieldCheck } from "lucide-react";
+import {
+  CalendarClock,
+  CalendarDays,
+  LayoutList,
+  LogIn,
+  LogOut,
+  ShieldCheck,
+} from "lucide-react";
 import logoSerenity from "@/assets/nova-serenity.png.asset.json";
 import logoNova from "@/assets/nova-only.png.asset.json";
 import { supabase } from "@/integrations/supabase/client";
@@ -72,6 +79,14 @@ export function Header() {
           >
             <CalendarDays className="size-4 shrink-0" />
             <span className="hidden sm:inline">Réserver</span>
+          </Link>
+          <Link
+            to="/planning"
+            className="flex items-center gap-2 rounded-md px-2.5 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:px-3"
+            activeProps={{ className: "text-foreground bg-accent" }}
+          >
+            <CalendarClock className="size-4 shrink-0" />
+            <span className="hidden sm:inline">Planning</span>
           </Link>
           <Link
             to="/reservations"
