@@ -7,8 +7,8 @@ type Admin = SupabaseClient<any, any, any>;
 export interface ReportFilters {
   from: string; // YYYY-MM-DD inclus
   to: string; // YYYY-MM-DD inclus
-  companyId?: string;
-  roomId?: string;
+  companyId?: string | undefined;
+  roomId?: string | undefined;
 }
 
 export interface CompanyStat {
