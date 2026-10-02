@@ -13,6 +13,8 @@ export interface Me {
   allowed: boolean;
   email: string;
   role: "admin" | "locataire" | null;
+  /** Compte accueil (super admin) : réserve pour autrui et télécharge les fiches. */
+  reception: boolean;
   company: MeCompany | null;
   quota: QuotaSummary | null;
 }
@@ -27,17 +29,31 @@ export const getMe = createServerFn({ method: "POST" })
     const email = String(context.claims["email"] ?? "").toLowerCase();
     const domain = email.split("@")[1] ?? "";
 
-    const { data: allowed } = await supabaseAdmin
-      .from("allowed_domains")
-      .select("domain, company_id, role")
-      .eq("domain", domain)
+    // Une adresse autorisée individuellement prime sur le domaine.
+    const { data: byEmail } = await supabaseAdmin
+      .from("allowed_emails" as never)
+      .select("email, company_id, role")
+      .eq("email", email)
       .maybeSingle();
 
+    const { data: byDomain } = byEmail
+      ? { data: null }
+      : await supabaseAdmin
+          .from("allowed_domains")
+          .select("domain, company_id, role")
+          .eq("domain", domain)
+          .maybeSingle();
+
+    const allowed = (byEmail ?? byDomain) as
+      | { company_id: string | null; role: string }
+      | null;
+
     if (!allowed) {
-      return { allowed: false, email, role: null, company: null, quota: null };
+      return { allowed: false, email, role: null, reception: false, company: null, quota: null };
     }
 
-    const role = allowed.role as "admin" | "locataire";
+    const reception = allowed.role === "accueil";
+    const role: "admin" | "locataire" = allowed.role === "locataire" ? "locataire" : "admin";
 
     await supabaseAdmin
       .from("profiles")
@@ -48,6 +64,11 @@ export const getMe = createServerFn({ method: "POST" })
     await supabaseAdmin
       .from("user_roles")
       .upsert({ user_id: context.userId, role }, { onConflict: "user_id,role" });
+    if (reception) {
+      await supabaseAdmin
+        .from("user_roles")
+        .upsert({ user_id: context.userId, role: "accueil" as never }, { onConflict: "user_id,role" });
+    }
 
     let company: MeCompany | null = null;
     let quota: QuotaSummary | null = null;
@@ -64,7 +85,7 @@ export const getMe = createServerFn({ method: "POST" })
       }
     }
 
-    return { allowed: true, email, role, company, quota };
+    return { allowed: true, email, role, reception, company, quota };
   });
 
 export const requestOverage = createServerFn({ method: "POST" })

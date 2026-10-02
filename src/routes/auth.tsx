@@ -34,6 +34,8 @@ function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [denied, setDenied] = useState(false);
+  const [mode, setMode] = useState<"password" | "link">("password");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const fetchMe = useServerFn(getMe);
 
@@ -65,6 +67,15 @@ function AuthPage() {
     if (busy) return;
     setBusy(true);
     setError(null);
+    if (mode === "password") {
+      const { error: err } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
+      setBusy(false);
+      if (err) setError("Identifiants incorrects.");
+      return;
+    }
     const { error: err } = await supabase.auth.signInWithOtp({
       email: email.trim().toLowerCase(),
       options: { emailRedirectTo: `${window.location.origin}/auth` },
@@ -122,6 +133,20 @@ function AuthPage() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+            <div className="grid grid-cols-2 gap-1 rounded-lg border border-border bg-card p-1 text-sm">
+              {(["password", "link"] as const).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setMode(m)}
+                  className={`rounded-md px-3 py-2 font-medium transition-colors ${
+                    mode === m ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"
+                  }`}
+                >
+                  {m === "password" ? "Mot de passe" : "Lien par e-mail"}
+                </button>
+              ))}
+            </div>
             <input
               type="email"
               required
@@ -131,13 +156,24 @@ function AuthPage() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-lg border border-input bg-card px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
+            {mode === "password" && (
+              <input
+                type="password"
+                required
+                autoComplete="current-password"
+                placeholder="Mot de passe"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-lg border border-input bg-card px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            )}
             {error && <p className="text-sm text-destructive">{error}</p>}
             <button
               type="submit"
               disabled={busy}
               className="w-full rounded-xl bg-primary px-6 py-3.5 font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-transform enabled:hover:scale-[1.02] disabled:opacity-50"
             >
-              {busy ? "Envoi…" : "Recevoir mon lien d'accès"}
+              {busy ? "Connexion…" : mode === "password" ? "Se connecter" : "Recevoir mon lien d'accès"}
             </button>
           </form>
         )}
