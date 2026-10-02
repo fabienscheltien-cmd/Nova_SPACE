@@ -51,7 +51,7 @@ function cell(text: string, width: number, header = false, size = 26) {
   return new TableCell({
     borders,
     width: { size: width, type: WidthType.DXA },
-    shading: header ? { fill: NAVY, type: ShadingType.CLEAR, color: "auto" } : undefined,
+    ...(header ? { shading: { fill: NAVY, type: ShadingType.CLEAR, color: "auto" } } : {}),
     margins: { top: 120, bottom: 120, left: 160, right: 160 },
     children: [
       new Paragraph({
