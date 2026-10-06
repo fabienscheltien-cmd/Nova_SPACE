@@ -2,6 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
+  BarChart3,
   CalendarClock,
   CalendarDays,
   LayoutList,
@@ -96,6 +97,16 @@ export function Header() {
             <LayoutList className="size-4 shrink-0" />
             <span className="hidden sm:inline">Réservations</span>
           </Link>
+          {me.data?.role === "admin" && (
+            <Link
+              to="/assistant"
+              className="flex items-center gap-2 rounded-md px-2.5 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:px-3"
+              activeProps={{ className: "text-foreground bg-accent" }}
+            >
+              <BarChart3 className="size-4 shrink-0" />
+              <span className="hidden sm:inline">Analyste IA</span>
+            </Link>
+          )}
           {me.data?.role === "admin" && (
             <Link
               to="/admin"
