@@ -43,6 +43,35 @@ export type Database = {
           },
         ]
       }
+      allowed_emails: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          email: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          email: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          email?: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "allowed_emails_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_settings: {
         Row: {
           created_at: string
@@ -210,6 +239,7 @@ export type Database = {
       }
       reservations: {
         Row: {
+          booked_by_email: string | null
           company_id: string | null
           confidential: boolean
           created_at: string
@@ -228,6 +258,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          booked_by_email?: string | null
           company_id?: string | null
           confidential?: boolean
           created_at?: string
@@ -246,6 +277,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          booked_by_email?: string | null
           company_id?: string | null
           confidential?: boolean
           created_at?: string
@@ -309,7 +341,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "locataire"
+      app_role: "admin" | "locataire" | "accueil"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -437,7 +469,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "locataire"],
+      app_role: ["admin", "locataire", "accueil"],
     },
   },
 } as const
