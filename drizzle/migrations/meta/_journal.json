@@ -8,6 +8,13 @@
       "when": 1791277997032,
       "tag": "0000_accueil_role_allowed_emails",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791550711977,
+      "tag": "0001_sites_rooms",
+      "breakpoints": true
     }
   ]
 }
