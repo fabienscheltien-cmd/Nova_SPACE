@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Check, Minus, Plus, ShieldAlert, Trash2, X } from "lucide-react";
 import { Header } from "@/components/Header";
+import { StructureAdmin } from "@/components/StructureAdmin";
 import { ROOMS, TIME_SLOTS, DURATIONS, formatDuration, formatDateFR } from "@/lib/rooms";
 import { getMe } from "@/lib/account.functions";
 import {
@@ -385,6 +386,7 @@ function AdminDashboard() {
             )}
           </div>
         </section>
+        <StructureAdmin />
       </main>
     </div>
   );
