@@ -20,18 +20,21 @@ export type Database = {
           created_at: string
           domain: string
           role: Database["public"]["Enums"]["app_role"]
+          site_id: string | null
         }
         Insert: {
           company_id?: string | null
           created_at?: string
           domain: string
           role?: Database["public"]["Enums"]["app_role"]
+          site_id?: string | null
         }
         Update: {
           company_id?: string | null
           created_at?: string
           domain?: string
           role?: Database["public"]["Enums"]["app_role"]
+          site_id?: string | null
         }
         Relationships: [
           {
@@ -39,6 +42,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "allowed_domains_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
             referencedColumns: ["id"]
           },
         ]
@@ -304,6 +314,77 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      rooms: {
+        Row: {
+          active: boolean
+          capacity: number
+          created_at: string
+          description: string
+          equipements: string[]
+          id: string
+          location: string
+          name: string
+          site_id: string
+        }
+        Insert: {
+          active?: boolean
+          capacity?: number
+          created_at?: string
+          description?: string
+          equipements?: string[]
+          id: string
+          location?: string
+          name: string
+          site_id: string
+        }
+        Update: {
+          active?: boolean
+          capacity?: number
+          created_at?: string
+          description?: string
+          equipements?: string[]
+          id?: string
+          location?: string
+          name?: string
+          site_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rooms_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sites: {
+        Row: {
+          active: boolean
+          address: string | null
+          city: string | null
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          active?: boolean
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          active?: boolean
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {

@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
 import { Route as AuthenticatedPlanningRouteImport } from './routes/_authenticated/planning'
+import { Route as AuthenticatedReportingRouteImport } from './routes/_authenticated/reporting'
 import { Route as AuthenticatedReservationsRouteImport } from './routes/_authenticated/reservations'
 import { Route as AuthenticatedReserverRouteImport } from './routes/_authenticated/reserver'
 import { Route as AuthenticatedConfirmationIdRouteImport } from './routes/_authenticated/confirmation.$id'
@@ -48,6 +49,11 @@ const AuthenticatedPlanningRoute = AuthenticatedPlanningRouteImport.update({
   path: '/planning',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedReportingRoute = AuthenticatedReportingRouteImport.update({
+  id: '/reporting',
+  path: '/reporting',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedReservationsRoute =
   AuthenticatedReservationsRouteImport.update({
     id: '/reservations',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/assistant': typeof AuthenticatedAssistantRoute
   '/planning': typeof AuthenticatedPlanningRoute
+  '/reporting': typeof AuthenticatedReportingRoute
   '/reservations': typeof AuthenticatedReservationsRoute
   '/reserver': typeof AuthenticatedReserverRoute
   '/confirmation/$id': typeof AuthenticatedConfirmationIdRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/assistant': typeof AuthenticatedAssistantRoute
   '/planning': typeof AuthenticatedPlanningRoute
+  '/reporting': typeof AuthenticatedReportingRoute
   '/reservations': typeof AuthenticatedReservationsRoute
   '/reserver': typeof AuthenticatedReserverRoute
   '/confirmation/$id': typeof AuthenticatedConfirmationIdRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/assistant': typeof AuthenticatedAssistantRoute
   '/_authenticated/planning': typeof AuthenticatedPlanningRoute
+  '/_authenticated/reporting': typeof AuthenticatedReportingRoute
   '/_authenticated/reservations': typeof AuthenticatedReservationsRoute
   '/_authenticated/reserver': typeof AuthenticatedReserverRoute
   '/_authenticated/confirmation/$id': typeof AuthenticatedConfirmationIdRoute
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/assistant'
     | '/planning'
+    | '/reporting'
     | '/reservations'
     | '/reserver'
     | '/confirmation/$id'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/assistant'
     | '/planning'
+    | '/reporting'
     | '/reservations'
     | '/reserver'
     | '/confirmation/$id'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/assistant'
     | '/_authenticated/planning'
+    | '/_authenticated/reporting'
     | '/_authenticated/reservations'
     | '/_authenticated/reserver'
     | '/_authenticated/confirmation/$id'
@@ -182,6 +194,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPlanningRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/reporting': {
+      id: '/_authenticated/reporting'
+      path: '/reporting'
+      fullPath: '/reporting'
+      preLoaderRoute: typeof AuthenticatedReportingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/reservations': {
       id: '/_authenticated/reservations'
       path: '/reservations'
@@ -210,6 +229,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAssistantRoute: typeof AuthenticatedAssistantRoute
   AuthenticatedPlanningRoute: typeof AuthenticatedPlanningRoute
+  AuthenticatedReportingRoute: typeof AuthenticatedReportingRoute
   AuthenticatedReservationsRoute: typeof AuthenticatedReservationsRoute
   AuthenticatedReserverRoute: typeof AuthenticatedReserverRoute
   AuthenticatedConfirmationIdRoute: typeof AuthenticatedConfirmationIdRoute
@@ -219,6 +239,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedAssistantRoute: AuthenticatedAssistantRoute,
   AuthenticatedPlanningRoute: AuthenticatedPlanningRoute,
+  AuthenticatedReportingRoute: AuthenticatedReportingRoute,
   AuthenticatedReservationsRoute: AuthenticatedReservationsRoute,
   AuthenticatedReserverRoute: AuthenticatedReserverRoute,
   AuthenticatedConfirmationIdRoute: AuthenticatedConfirmationIdRoute,
